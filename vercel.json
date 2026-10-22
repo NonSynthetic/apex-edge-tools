@@ -2,19 +2,19 @@
   "rewrites": [
     {
       "source": "/health",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/health"
+      "destination": "https://api.nonsynthetic.net/health"
     },
     {
       "source": "/mcp",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/mcp"
+      "destination": "https://api.nonsynthetic.net/mcp"
     },
     {
       "source": "/a2a",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/a2a"
+      "destination": "https://api.nonsynthetic.net/a2a"
     },
     {
       "source": "/api/:path*",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/api/:path*"
+      "destination": "https://api.nonsynthetic.net/api/:path*"
     },
     {
       "source": "/.well-known/agent-card.json",
@@ -38,23 +38,23 @@
     },
     {
       "source": "/.well-known/:path*",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/.well-known/:path*"
+      "destination": "https://api.nonsynthetic.net/.well-known/:path*"
     },
     {
       "source": "/openapi.json",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/openapi.json"
+      "destination": "https://api.nonsynthetic.net/openapi.json"
     },
     {
       "source": "/llms.txt",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/llms.txt"
+      "destination": "https://api.nonsynthetic.net/llms.txt"
     },
     {
       "source": "/ai.txt",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/ai.txt"
+      "destination": "https://api.nonsynthetic.net/ai.txt"
     },
     {
       "source": "/sitemap.xml",
-      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/sitemap.xml"
+      "destination": "https://api.nonsynthetic.net/sitemap.xml"
     }
   ]
 }
