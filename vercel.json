@@ -1,0 +1,60 @@
+{
+  "rewrites": [
+    {
+      "source": "/health",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/health"
+    },
+    {
+      "source": "/mcp",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/mcp"
+    },
+    {
+      "source": "/a2a",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/a2a"
+    },
+    {
+      "source": "/api/:path*",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/api/:path*"
+    },
+    {
+      "source": "/.well-known/agent-card.json",
+      "destination": "https://nonsynthetic.pages.dev/.well-known/agent-card.json"
+    },
+    {
+      "source": "/.well-known/agent.json",
+      "destination": "https://nonsynthetic.pages.dev/.well-known/agent.json"
+    },
+    {
+      "source": "/.well-known/agent-registration.json",
+      "destination": "https://nonsynthetic.pages.dev/.well-known/agent-registration.json"
+    },
+    {
+      "source": "/.well-known/ai-plugin.json",
+      "destination": "https://nonsynthetic.pages.dev/.well-known/ai-plugin.json"
+    },
+    {
+      "source": "/.well-known/security.txt",
+      "destination": "https://nonsynthetic.pages.dev/.well-known/security.txt"
+    },
+    {
+      "source": "/.well-known/:path*",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/.well-known/:path*"
+    },
+    {
+      "source": "/openapi.json",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/openapi.json"
+    },
+    {
+      "source": "/llms.txt",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/llms.txt"
+    },
+    {
+      "source": "/ai.txt",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/ai.txt"
+    },
+    {
+      "source": "/sitemap.xml",
+      "destination": "https://apex-edge.YOUR-ACCOUNT.workers.dev/sitemap.xml"
+    }
+  ]
+}

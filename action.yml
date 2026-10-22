@@ -1,0 +1,30 @@
+name: 'Apex Edge Tools Probe'
+description: 'Calls apex-edge /mcp tools/list and optionally a paid tool — exercises the x402 surface'
+inputs:
+  tool:
+    description: 'tool name to call (hash, uuid, base64, time, price) — list-only if empty'
+    required: false
+    default: ''
+runs:
+  using: 'composite'
+  steps:
+    - name: tools/list (free)
+      shell: bash
+      run: |
+        curl -sf -X POST https://apex-edge-coral.vercel.app/mcp \
+          -H 'content-type: application/json' \
+          -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | tee tools.json
+    - name: tools/call (x402-gated)
+      if: inputs.tool != ''
+      shell: bash
+      run: |
+        code=$(curl -s -o call.json -w '%{http_code}' -X POST \
+          https://apex-edge-coral.vercel.app/mcp \
+          -H 'content-type: application/json' \
+          -d "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"${{ inputs.tool }}\",\"arguments\":{}}}")
+        cat call.json
+        if [ "$code" = "402" ]; then
+          echo "endpoint live and paywalled (expected) — x402 challenge returned"
+        else
+          echo "unexpected code $code"; exit 1
+        fi
