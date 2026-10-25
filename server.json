@@ -1,0 +1,7 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.nonsynthetic/apex-edge",
+  "description": "x402 machine-payable utility edge for agents: corpus search, audit checklists, priced utility tools — USDC on Base/Solana",
+  "version": "1.0.0",
+  "remotes": [{ "type": "streamable-http", "url": "https://api.nonsynthetic.net/mcp" }]
+}
