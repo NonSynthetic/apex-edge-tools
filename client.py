@@ -6,7 +6,7 @@ complete payment on Base or Solana USDC to the payTo in the challenge.
 """
 import json, sys, urllib.request
 
-BASE = "https://apex-edge-coral.vercel.app/mcp"
+BASE = "https://api.nonsynthetic.net/mcp"
 
 def rpc(method, params=None):
     body = {"jsonrpc": "2.0", "id": 1, "method": method}

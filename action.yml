@@ -11,7 +11,7 @@ runs:
     - name: tools/list (free)
       shell: bash
       run: |
-        curl -sf -X POST https://apex-edge-coral.vercel.app/mcp \
+        curl -sf -X POST https://api.nonsynthetic.net/mcp \
           -H 'content-type: application/json' \
           -d '{"jsonrpc":"2.0","id":1,"method":"tools/list"}' | tee tools.json
     - name: tools/call (x402-gated)
@@ -19,7 +19,7 @@ runs:
       shell: bash
       run: |
         code=$(curl -s -o call.json -w '%{http_code}' -X POST \
-          https://apex-edge-coral.vercel.app/mcp \
+          https://api.nonsynthetic.net/mcp \
           -H 'content-type: application/json' \
           -d "{\"jsonrpc\":\"2.0\",\"id\":2,\"method\":\"tools/call\",\"params\":{\"name\":\"${{ inputs.tool }}\",\"arguments\":{}}}")
         cat call.json
