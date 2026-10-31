@@ -13,3 +13,7 @@ handle the 402 challenge.
 
 Contents: `client.py` (x402-aware client example), `action.yml` (agent action
 descriptor), `server.json` (MCP registry manifest), `index.html` (landing).
+
+---
+
+<a href="https://nonsynthetic.net/open.html"><img src="https://api.nonsynthetic.net/api/v1/badge/tsc" alt="nonsynthetic task-solve counter" width="110"></a> live settlement counter — x402-payed agent economy.
