@@ -4,40 +4,45 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: full payment-surface audit
+      - name: install jq
+        run: sudo apt-get install -y jq >/dev/null 2>&1 || true
+      - name: free + discovery surfaces
         run: |
-          echo "=== FREE/DISCOVERY SURFACES ==="
-          for p in "/llms.txt" "/.well-known/agent.json" "/.well-known/mcp.json" "/.well-known/x402" "/openapi.json" "/api/v1/board/tasks" "/api/v1/board/tasks?status=open" "/api/v1/stats" "/api/v1/activity.json" "/v1/models" "/mcp" "/a2a"; do
-            code=$(curl -sS -o /tmp/b.out -w "%{http_code}" --max-time 15 "https://api.nonsynthetic.net$p"); size=$(wc -c < /tmp/b.out); ctype=$(grep -io 'content-type[^ ]* [^ ;]*' /tmp/b.out | head -1); echo "$code ${size}B  GET $p"
+          for p in "/llms.txt" "/.well-known/agent.json" "/.well-known/mcp.json" "/.well-known/x402" "/openapi.json" "/api/v1/board/tasks" "/api/v1/stats" "/api/v1/activity.json" "/v1/models" "/mcp"; do
+            code=$(curl -sS -o /tmp/b.out -w "%{http_code}" --max-time 15 "https://api.nonsynthetic.net$p")
+            size=$(wc -c < /tmp/b.out)
+            echo "$code ${size}B  GET $p"
             sleep 0.5
           done
-          echo "=== PAID SURFACES (expect 402 w/ proper x402 shape) ==="
-          for spec in "POST /api/v1/chat/pro {\"prompt\":\"hi\"}" \
-                      "POST /v1/chat/completions {\"model\":\"apex/nano\",\"messages\":[{\"role\":\"user\",\"content\":\"hi\"}]}" \
-                      "POST /api/v1/audit/honesty {\"files\":{\"a.py\":\"x=1\"}}" \
-                      "POST /api/v1/audit/preflight {\"files\":{\"a.py\":\"x=1\"}}" \
-                      "POST /api/v1/audit/checklist {}" \
-                      "POST /api/v1/audit/address {\"address\":\"0xd41EFde20caFBe8C29B3509087AC5c4364ae5A51\"}" \
-                      "POST /api/v1/market/arb-scan {}" \
-                      "POST /api/v1/intel/venue-map {}" \
-                      "GET /api/v1/mine?name=probeaudit {}" \
-                      "POST /api/v1/armory/hash_text {\"text\":\"x\"}"; do
-            m=$(echo "$spec" | cut -d' ' -f1); p=$(echo "$spec" | cut -d' ' -f2); body=$(echo "$spec" | cut -d' ' -f3-)
+      - name: paid surfaces - expect 402 x402 shape
+        run: |
+          probe() {
+            m="$1"; p="$2"; body="$3"
             code=$(curl -sS -o /tmp/b.out -w "%{http_code}" --max-time 20 -X "$m" "https://api.nonsynthetic.net$p" -H "content-type: application/json" -d "$body")
-            shape=$(python3 -c "import json,sys
-try:
-  d=json.load(open('/tmp/b.out'))
-  print('x402_v'+str(d.get('x402Version','?'))+' accepts:'+str(len(d.get('accepts',[]))) if d.get('x402Version') else str(d)[:120])
-except: print('non-json:'+open('/tmp/b.out').read()[:120].replace(chr(10),' '))" 2>/dev/null || echo "parse-skip")
+            shape=$(jq -r 'if .x402Version then "x402v"+(.x402Version|tostring)+" accepts:"+(.accepts|length|tostring) else .detail // .code // (.|tostring|.[0:100]) end' /tmp/b.out 2>/dev/null || head -c 100 /tmp/b.out | tr -d '\n')
             echo "$code  $m $p  ->  $shape"
             sleep 0.6
-          done
-          echo "=== X402 CHALLENGE SHAPE (chat/pro detail) ==="
-          curl -sS --max-time 20 -X POST "https://api.nonsynthetic.net/api/v1/chat/pro" -H "content-type: application/json" -d '{"prompt":"hi"}' | head -c 1200; echo
-          echo "=== EDGE CASES ==="
-          for spec in "GET /api/v1/chat/pro" "POST /a2a {}" "GET /pay.html" "GET /earn.html" "GET /start.html"; do
-            m=$(echo "$spec" | cut -d' ' -f1); p=$(echo "$spec" | cut -d' ' -f2); body=$(echo "$spec" | cut -d' ' -f3-)
-            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 -X "$m" "https://api.nonsynthetic.net$p" -H "content-type: application/json" ${body:+-d "$body"})
+          }
+          probe POST /api/v1/chat/pro '{"prompt":"hi"}'
+          probe POST /v1/chat/completions '{"model":"apex/nano","messages":[{"role":"user","content":"hi"}]}'
+          probe POST /api/v1/audit/honesty '{"files":{"a.py":"x=1"}}'
+          probe POST /api/v1/audit/preflight '{"files":{"a.py":"x=1"}}'
+          probe POST /api/v1/audit/checklist '{}'
+          probe POST /api/v1/audit/address '{"address":"0xd41EFde20caFBe8C29B3509087AC5c4364ae5A51"}'
+          probe POST /api/v1/market/arb-scan '{}'
+          probe POST /api/v1/intel/venue-map '{}'
+          probe GET "/api/v1/mine?name=probeaudit" ''
+          probe POST /api/v1/armory/hash_text '{"text":"x"}'
+          probe POST /api/v1/corpus/bundle '{}'
+          probe POST /api/v1/ai/summarize '{"text":"hello world this is a test"}'
+      - name: challenge shape detail + edge cases
+        run: |
+          echo "--- chat/pro 402 body ---"
+          curl -sS --max-time 20 -X POST "https://api.nonsynthetic.net/api/v1/chat/pro" -H "content-type: application/json" -d '{"prompt":"hi"}' | head -c 1500; echo
+          echo "--- edge cases ---"
+          for spec in "GET /api/v1/chat/pro" "GET /pay.html" "GET /earn.html" "GET /start.html" "GET /api/v1/bounties/full" "GET /api/v1/dispatch/route"; do
+            m=$(echo "$spec" | cut -d' ' -f1); p=$(echo "$spec" | cut -d' ' -f2)
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 -X "$m" "https://api.nonsynthetic.net$p")
             echo "$code  $m $p"
             sleep 0.4
           done
