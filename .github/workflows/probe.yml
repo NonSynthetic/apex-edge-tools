@@ -4,45 +4,21 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: install jq
-        run: sudo apt-get install -y jq >/dev/null 2>&1 || true
-      - name: free + discovery surfaces
+      - name: UA + host discrimination test
         run: |
-          for p in "/llms.txt" "/.well-known/agent.json" "/.well-known/mcp.json" "/.well-known/x402" "/openapi.json" "/api/v1/board/tasks" "/api/v1/stats" "/api/v1/activity.json" "/v1/models" "/mcp"; do
-            code=$(curl -sS -o /tmp/b.out -w "%{http_code}" --max-time 15 "https://api.nonsynthetic.net$p")
-            size=$(wc -c < /tmp/b.out)
-            echo "$code ${size}B  GET $p"
-            sleep 0.5
-          done
-      - name: paid surfaces - expect 402 x402 shape
-        run: |
-          probe() {
-            m="$1"; p="$2"; body="$3"
-            code=$(curl -sS -o /tmp/b.out -w "%{http_code}" --max-time 20 -X "$m" "https://api.nonsynthetic.net$p" -H "content-type: application/json" -d "$body")
-            shape=$(jq -r 'if .x402Version then "x402v"+(.x402Version|tostring)+" accepts:"+(.accepts|length|tostring) else .detail // .code // (.|tostring|.[0:100]) end' /tmp/b.out 2>/dev/null || head -c 100 /tmp/b.out | tr -d '\n')
-            echo "$code  $m $p  ->  $shape"
-            sleep 0.6
-          }
-          probe POST /api/v1/chat/pro '{"prompt":"hi"}'
-          probe POST /v1/chat/completions '{"model":"apex/nano","messages":[{"role":"user","content":"hi"}]}'
-          probe POST /api/v1/audit/honesty '{"files":{"a.py":"x=1"}}'
-          probe POST /api/v1/audit/preflight '{"files":{"a.py":"x=1"}}'
-          probe POST /api/v1/audit/checklist '{}'
-          probe POST /api/v1/audit/address '{"address":"0xd41EFde20caFBe8C29B3509087AC5c4364ae5A51"}'
-          probe POST /api/v1/market/arb-scan '{}'
-          probe POST /api/v1/intel/venue-map '{}'
-          probe GET "/api/v1/mine?name=probeaudit" ''
-          probe POST /api/v1/armory/hash_text '{"text":"x"}'
-          probe POST /api/v1/corpus/bundle '{}'
-          probe POST /api/v1/ai/summarize '{"text":"hello world this is a test"}'
-      - name: challenge shape detail + edge cases
-        run: |
-          echo "--- chat/pro 402 body ---"
-          curl -sS --max-time 20 -X POST "https://api.nonsynthetic.net/api/v1/chat/pro" -H "content-type: application/json" -d '{"prompt":"hi"}' | head -c 1500; echo
-          echo "--- edge cases ---"
-          for spec in "GET /api/v1/chat/pro" "GET /pay.html" "GET /earn.html" "GET /start.html" "GET /api/v1/bounties/full" "GET /api/v1/dispatch/route"; do
-            m=$(echo "$spec" | cut -d' ' -f1); p=$(echo "$spec" | cut -d' ' -f2)
-            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 -X "$m" "https://api.nonsynthetic.net$p")
-            echo "$code  $m $p"
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          for host in api.nonsynthetic.net www.nonsynthetic.net nonsynthetic.net dev.nonsynthetic.net stage.nonsynthetic.net; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 12 "https://$host/llms.txt")
+            ua_code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 12 -H "User-Agent: $UA" "https://$host/llms.txt")
+            echo "$host  curl=$code  browserUA=$ua_code"
             sleep 0.4
           done
+      - name: api same test on api paths
+        run: |
+          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+          for p in "/llms.txt" "/v1/models" "/" ; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 12 "https://www.nonsynthetic.net$p")
+            echo "www$p -> $code"
+          done
+          curl -sS --max-time 12 -H "User-Agent: $UA" -o /tmp/b.out -w "api browserUA code=%{http_code} size=%{size_download}\n" "https://api.nonsynthetic.net/v1/models"
+          head -c 200 /tmp/b.out; echo
