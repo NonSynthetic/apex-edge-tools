@@ -5,10 +5,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "=== curl openapi from datacenter ==="
-          curl -sS -o /dev/null -w "openapi: %{http_code} %{size_download}b in %{time_total}s\n" --max-time 20 https://api.nonsynthetic.net/openapi.json
-          curl -sS -o /dev/null -w "wellknown: %{http_code} %{size_download}b in %{time_total}s\n" --max-time 20 https://api.nonsynthetic.net/.well-known/x402
-          echo "=== node fetch ==="
-          node -e "fetch('https://api.nonsynthetic.net/openapi.json').then(r=>r.text()).then(t=>console.log('node fetch OK', t.length)).catch(e=>console.log('node fetch ERR', e.message))"
-          echo "=== checkDiscovery on their api ==="
-          curl -sS -X POST "https://www.x402scan.com/api/trpc/public.resources.checkDiscovery?batch=1" -H "Content-Type: application/json" -d '{"0":{"json":{"origin":"https://api.nonsynthetic.net","bustCache":true}}}' --max-time 60
+          echo "=== 403 body ==="
+          curl -sS --max-time 20 https://api.nonsynthetic.net/openapi.json | head -c 2000
+          echo
+          echo "=== headers ==="
+          curl -sSI --max-time 20 https://api.nonsynthetic.net/openapi.json | head -20
+          echo "=== well-known body (works) ==="
+          curl -sS --max-time 20 https://api.nonsynthetic.net/.well-known/x402 | head -c 200
