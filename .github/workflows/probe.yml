@@ -5,9 +5,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for p in /openapi.json /.well-known/x402 /.well-known/agent.json /.well-known/mcp.json /llms.txt /ai.txt /api/v1/board/tasks /api/v1/free/describe /robots.txt /sitemap.xml /start.html /earn.html; do
-            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://api.nonsynthetic.net$p"); echo "api  $code  $p"
+          for p in /openapi.json /.well-known/x402 /.well-known/agent.json /.well-known/mcp.json /llms.txt /ai.txt /api/v1/board/tasks /api/v1/free/describe /robots.txt /sitemap.xml /start.html /earn.html /v1/models; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://api.nonsynthetic.net$p"); echo "api  $code  GET $p"
           done
+          echo "--- POST /v1/chat/completions (expect 402) ---"
+          curl -sS -o /tmp/cc.json -w "code=%{http_code}\n" --max-time 20 -X POST "https://api.nonsynthetic.net/v1/chat/completions" -H "content-type: application/json" -d '{"model":"nonsynthetic/auto","messages":[{"role":"user","content":"hi"}]}'
+          head -c 1200 /tmp/cc.json; echo
+          echo "--- GET /v1/models body ---"
+          curl -sS --max-time 15 "https://api.nonsynthetic.net/v1/models" | head -c 1200; echo
+          echo "--- POST /api/v1/chat/pro regression (expect 402) ---"
+          curl -sS -o /dev/null -w "code=%{http_code}\n" --max-time 20 -X POST "https://api.nonsynthetic.net/api/v1/chat/pro" -H "content-type: application/json" -d '{"prompt":"hi"}'
           for p in /openapi.json /robots.txt /sitemap.xml /; do
             code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://nonsynthetic.net$p"); echo "www  $code  $p"
           done
