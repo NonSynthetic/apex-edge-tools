@@ -4,21 +4,12 @@ jobs:
   probe:
     runs-on: ubuntu-latest
     steps:
-      - name: UA + host discrimination test
+      - name: single-request cold test (fresh runner IP, NO sweep)
         run: |
-          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-          for host in api.nonsynthetic.net www.nonsynthetic.net nonsynthetic.net dev.nonsynthetic.net stage.nonsynthetic.net; do
-            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 12 "https://$host/llms.txt")
-            ua_code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 12 -H "User-Agent: $UA" "https://$host/llms.txt")
-            echo "$host  curl=$code  browserUA=$ua_code"
-            sleep 0.4
-          done
-      - name: api same test on api paths
-        run: |
-          UA='Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-          for p in "/llms.txt" "/v1/models" "/" ; do
-            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 12 "https://www.nonsynthetic.net$p")
-            echo "www$p -> $code"
-          done
-          curl -sS --max-time 12 -H "User-Agent: $UA" -o /tmp/b.out -w "api browserUA code=%{http_code} size=%{size_download}\n" "https://api.nonsynthetic.net/v1/models"
-          head -c 200 /tmp/b.out; echo
+          echo "=== exactly ONE request: is a cold IP challenged? ==="
+          curl -sS -o /tmp/b.out -w "code=%{http_code} size=%{size_download}\n" --max-time 15 "https://api.nonsynthetic.net/llms.txt"
+          head -c 300 /tmp/b.out; echo
+          sleep 30
+          echo "=== after 30s pause, one more: adaptive or standing? ==="
+          curl -sS -o /tmp/b2.out -w "code=%{http_code} size=%{size_download}\n" --max-time 15 "https://api.nonsynthetic.net/v1/models"
+          head -c 200 /tmp/b2.out; echo
