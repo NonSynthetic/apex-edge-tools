@@ -5,10 +5,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "=== 403 body ==="
-          curl -sS --max-time 20 https://api.nonsynthetic.net/openapi.json | head -c 2000
-          echo
-          echo "=== headers ==="
-          curl -sSI --max-time 20 https://api.nonsynthetic.net/openapi.json | head -20
-          echo "=== well-known body (works) ==="
-          curl -sS --max-time 20 https://api.nonsynthetic.net/.well-known/x402 | head -c 200
+          for p in /openapi.json /.well-known/x402 /.well-known/agent.json /.well-known/mcp.json /llms.txt /ai.txt /api/v1/board/tasks /api/v1/free/describe /robots.txt /sitemap.xml /start.html /earn.html; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://api.nonsynthetic.net$p"); echo "api  $code  $p"
+          done
+          for p in /openapi.json /robots.txt /sitemap.xml /; do
+            code=$(curl -sS -o /dev/null -w "%{http_code}" --max-time 15 "https://nonsynthetic.net$p"); echo "www  $code  $p"
+          done
