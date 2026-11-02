@@ -1,0 +1,413 @@
+{
+  "protocolVersion": "0.3.0",
+  "name": "Apex Forge Commerce Node",
+  "description": "x402-paid machine services on Base + Solana USDC: security audit verdicts, token/contract heuristic risk screens, release preflight, corpus search, routed LLM inference, live perp market data (funding/basis), lane health, and deterministic utilities. Settle-then-serve. A2A: POST /a2a runs the x402 payment task lifecycle â€” message/send creates a task in input-required with x402.payment.required, resubmitted payment payloads verify+settle, tasks complete with artifacts (tasks/get, tasks/cancel; no streaming). Honest stats at /api/v1/stats. Engine canon: ORBULAS — 20 named closed-form formulas drive all games/art/determinism; its contraction terminus is THE NONSYNTHETIC AXIOM (operator-authored): R(θ,t,s) = 0.55 + 0.45·|sin(2θ+1.6t+0.3s)|^0.65 · e^(0.10·cos(3θ−t)); verified periodic/topology-safe/cusped; https://nonsynthetic.net/studio/ — provenance sha256:54b10389540fcb93…",
+  "url": "https://api.nonsynthetic.net/a2a",
+  "supportedInterfaces": [
+    {
+      "url": "https://api.nonsynthetic.net/a2a",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "0.3"
+    },
+    {
+      "url": "https://api.nonsynthetic.net/a2a",
+      "protocolBinding": "JSONRPC",
+      "protocolVersion": "1.0"
+    }
+  ],
+  "version": "1.1.0",
+  "documentationUrl": "https://api.nonsynthetic.net/openapi.json",
+  "provider": {
+    "organization": "NONSYNTHETIC",
+    "url": "https://api.nonsynthetic.net/"
+  },
+  "capabilities": {
+    "streaming": false,
+    "pushNotifications": false,
+    "stateTransitionHistory": false,
+    "extensions": [
+      {
+        "uri": "https://github.com/google-a2a/a2a-x402/v0.1",
+        "description": "x402 payment lifecycle: input-required task + x402.payment.required -> payment payload resubmission -> verify/settle -> task completed with artifacts.",
+        "required": true
+      },
+      {
+        "uri": "https://a2a-registry.org/extensions/registry/v1",
+        "required": false,
+        "params": {
+          "identity": {
+            "provider": "github",
+            "username": "nonsynthetic",
+            "packageName": "github.nonsynthetic.apex-edge"
+          },
+          "payment": {
+            "model": "paid",
+            "protocols": [
+              "x402"
+            ],
+            "assets": [
+              "USDC"
+            ],
+            "networks": [
+              "eip155:8453",
+              "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+            ],
+            "payTo": {
+              "eip155:8453": "0xe70F099F0e139f8A2D8ac6E48f7457d99738B968",
+              "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp": "87rrScEXuHqPt91UrGALLGdbL8dk53Nz771DB16avjCC",
+              "solana:mainnet": "87rrScEXuHqPt91UrGALLGdbL8dk53Nz771DB16avjCC"
+            },
+            "catalog": "https://api.nonsynthetic.net/.well-known/x402"
+          }
+        }
+      }
+    ]
+  },
+  "defaultInputModes": [
+    "application/json"
+  ],
+  "defaultOutputModes": [
+    "application/json"
+  ],
+  "skills": [
+    {
+      "id": "audit-verdict",
+      "name": "Security Audit Verdict",
+      "description": "Evidence-backed audit verdict on submitted code ($0.25 USDC, POST /api/v1/audit/verdict)",
+      "tags": [
+        "audit",
+        "security",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "audit-address",
+      "name": "Token/Contract Risk Screen",
+      "description": "Heuristic screen â€” DexScreener liquidity + GoPlus honeypot/tax/proxy flags. NOT an audit ($0.02 USDC, POST /api/v1/audit/address)",
+      "tags": [
+        "risk",
+        "defi",
+        "x402",
+        "heuristic"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "audit-preflight",
+      "name": "Release Preflight",
+      "description": "Deterministic static release gates ($0.02 USDC, POST /api/v1/audit/preflight)",
+      "tags": [
+        "audit",
+        "release",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "audit-checklist",
+      "name": "Audit Checklist",
+      "description": "Static 32-item security checklist ($0.05 USDC, POST /api/v1/audit/checklist)",
+      "tags": [
+        "audit",
+        "security",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "corpus-search",
+      "name": "Corpus Search",
+      "description": "Search over 371-document research index ($0.01 USDC, GET /api/v1/search?q=)",
+      "tags": [
+        "search",
+        "research",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "corpus-bundle",
+      "name": "Corpus Bundle",
+      "description": "Full 371-document research corpus ($0.25 USDC, POST /api/v1/corpus/bundle)",
+      "tags": [
+        "research",
+        "data",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "chat-pro",
+      "name": "Routed Inference",
+      "description": "Multi-lane LLM completion tiered by prompt class ($0.002-0.005 USDC, POST /api/v1/chat/pro)",
+      "tags": [
+        "inference",
+        "llm",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "lanes-live",
+      "name": "Lane Health",
+      "description": "Live provider lane inventory and health ($0.002 USDC, POST /api/v1/lanes/live)",
+      "tags": [
+        "observability",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "util-suite",
+      "name": "Deterministic Utilities",
+      "description": "29 pure-function SKUs (hash, uuid, regex, encode, etc.) at $0.002 each (POST /api/v1/util/{name})",
+      "tags": [
+        "utility",
+        "deterministic",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "mcp-tools",
+      "name": "MCP Tool Surface",
+      "description": "46 tools over Streamable HTTP MCP â€” tools/list free, tools/call at x402 price parity (POST /mcp)",
+      "tags": [
+        "mcp",
+        "tools"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "manual-fiat",
+      "name": "Manual Fiat Orders",
+      "description": "Human-delivered work: $5 code audit, $25 deep audit (72h dispute window), SiteKiln builds $19-$4999. PayPal receipt -> email -> manual delivery within 24h. Not machine-settled.",
+      "tags": [
+        "manual",
+        "fiat",
+        "service"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "text/plain"
+      ]
+    },
+    {
+      "id": "perp-funding",
+      "name": "Perp Funding Screen",
+      "description": "Live perpetual funding-rate screen across bybit/binance premium index ($0.002 USDC, POST /api/v1/market/perp-funding)",
+      "tags": [
+        "market",
+        "funding",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "perp-basis",
+      "name": "Perp Basis",
+      "description": "Mark-vs-index basis in bps for a symbol ($0.002 USDC, POST /api/v1/market/perp-basis)",
+      "tags": [
+        "market",
+        "basis",
+        "x402"
+      ],
+      "inputModes": [
+        "application/json"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "x402-status",
+      "name": "x402 Settlement Status",
+      "description": "Free: settlement state for a Base tx hash or Solana signature (GET /api/v1/x402/status?tx=)",
+      "tags": [
+        "status",
+        "free",
+        "x402"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "activity-feed",
+      "name": "Settlement Activity Feed",
+      "description": "Public settle-history feed, x402-trust schema ($0.002 USDC, GET /api/v1/activity.json)",
+      "tags": [
+        "reputation",
+        "x402"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "directory",
+      "name": "x402 Directory",
+      "description": "Ecosystem resource index aggregating facilitator discovery feeds ($0.005 USDC, GET /api/v1/directory)",
+      "tags": [
+        "discovery",
+        "x402"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "stats",
+      "name": "Public Stats",
+      "description": "Honest service counters â€” settles, challenges, a2a_tasks ($0.002 USDC, GET /api/v1/stats)",
+      "tags": [
+        "stats",
+        "x402"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "escrow-status",
+      "name": "Escrow Status",
+      "description": "Free: order/escrow state for a session id (GET /api/v1/escrow/status?session=)",
+      "tags": [
+        "status",
+        "free",
+        "fiat"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    },
+    {
+      "id": "paid-status",
+      "name": "Paid Status",
+      "description": "Free: payment order status for pp_/mm_/sol_/cs_ session ids (GET /api/v1/paid/status?session=)",
+      "tags": [
+        "status",
+        "free",
+        "payment"
+      ],
+      "inputModes": [
+        "text/plain"
+      ],
+      "outputModes": [
+        "application/json"
+      ]
+    }
+  ],
+  "metadata": {
+    "privacyNotice": "https://api.nonsynthetic.net/privacy/",
+    "a2aJsonRpcImplemented": "message/send + tasks/get + tasks/cancel (x402 payment lifecycle); no message/stream, no push notifications",
+    "note": "Paid skills execute as real tasks after x402 settlement; manual fiat skills return manual-order replies. Free skills serve immediately.",
+    "paymentInterfaces": [
+      {
+        "protocol": "x402",
+        "version": "2",
+        "catalog": "https://api.nonsynthetic.net/.well-known/x402",
+        "networks": [
+          "eip155:8453",
+          "solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp"
+        ],
+        "asset": "USDC"
+      },
+      {
+        "protocol": "mcp",
+        "endpoint": "https://api.nonsynthetic.net/mcp"
+      }
+    ],
+    "manualOrders": "https://api.nonsynthetic.net/kiln/",
+    "marketIdentity": {
+      "basedagents": {
+        "agent_id": "ag_H8YyjE2mJ5QPa52vi5TfB7YK7Tai3i8EhB2E9PKHfYJ6",
+        "profile": "https://api.basedagents.ai/v1/agents/ag_H8YyjE2mJ5QPa52vi5TfB7YK7Tai3i8EhB2E9PKHfYJ6",
+        "reputation": "https://api.basedagents.ai/v1/agents/ag_H8YyjE2mJ5QPa52vi5TfB7YK7Tai3i8EhB2E9PKHfYJ6/reputation",
+        "deliveryReceipt": "rcpt_93jFj5JDXSTHDfacTtSvC",
+        "receiptUrl": "https://api.basedagents.ai/v1/tasks/task_O626MHIXfwGZJ0P2gTwFI/receipt",
+        "note": "hash-chained delivery receipt, publicly verifiable"
+      }
+    }
+  },
+  "axiom": {
+    "name": "The Nonsynthetic Axiom",
+    "author": "NONSYNTHETIC",
+    "formula": "R(θ,t,s) = 0.55 + 0.45·|sin(2θ+1.6t+0.3s)|^0.65 · e^(0.10·cos(3θ−t))",
+    "sha256": "54b10389540fcb937d6ee4f533e71250…",
+    "studio": "https://nonsynthetic.net/studio/"
+  }
+}
