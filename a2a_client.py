@@ -94,6 +94,9 @@ def cmd_tasks(status="open", limit=20):
 def cmd_mine(name, task=None, token=None, deliverable=None, release=None):
     kit = load_kit(name)
     q = f"/mine?name={urllib.parse.quote(name)}"
+    # cs_* is the name's key — without it every claim 403s secret_required
+    if kit.get("claimer_secret"):
+        q += "&secret=" + urllib.parse.quote(kit["claimer_secret"])
     if task:
         q += f"&task={task}&token={token}"
         if deliverable:
